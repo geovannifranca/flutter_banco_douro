@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_banco_douro/ui/styles/app_colors.dart';
+
 
 class LoginScreem extends StatelessWidget {
   const LoginScreem({super.key});
@@ -49,9 +51,13 @@ class LoginScreem extends StatelessWidget {
                     ),
                     SizedBox(height: 16),
                     ElevatedButton(
-                      onPressed: (){},
+                      onPressed: (){
+                        Navigator.pushReplacementNamed(context,"home");
+                      },
                       style: ButtonStyle(
-                        backgroundColor: WidgetStatePropertyAll(Color(0XFFFFA902),),
+                        backgroundColor: WidgetStatePropertyAll(
+                          AppColors.orange,
+                        ),
                       ),
                       child: const
                       Text(
