@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_banco_douro/ui/styles/app_colors.dart';
+import 'package:flutter_banco_douro/services/account_service.dart';
+import 'package:uuid/uuid.dart';
+
+import '../../models/account.dart';
+import '../styles/app_colors.dart';
 
 class AddAccountModelWidget extends StatefulWidget {
   const AddAccountModelWidget({super.key});
@@ -10,6 +14,47 @@ class AddAccountModelWidget extends StatefulWidget {
 
 class _AddAccountModelWidgetState extends State<AddAccountModelWidget> {
   String _accountType = "ANBROSIA";
+
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _lasrnameController = TextEditingController();
+  final AccountService _accountService = AccountService();
+  bool isLoading = false;
+
+  void clouseModal(){
+    Navigator.pop(context);
+  }
+
+  _onButtomCancelClicked() {
+    if (!isLoading) {
+      Navigator.pop(context);
+    }
+  }
+
+  _onButtomSendClicked() async{
+    if(!isLoading){
+      setState(() {
+        isLoading = true;
+      });
+      String name = _nameController.text;
+      String lastName = _lasrnameController.text;
+      Account account = Account(
+        id: Uuid().v1(),
+        name: name,
+        lastName: lastName,
+        balance: 0,
+        accountType: _accountType,
+      );
+
+        if(name.isNotEmpty && lastName.isNotEmpty){
+          await _accountService.addAccount(account);
+        }
+      clouseModal();
+
+
+    }
+
+  }
+
 
 
   @override
@@ -46,9 +91,11 @@ class _AddAccountModelWidgetState extends State<AddAccountModelWidget> {
             ),
 
             TextFormField(
+              controller: _nameController,
               decoration: InputDecoration(label: const Text("Nome")),
             ),
             TextFormField(
+              controller: _lasrnameController,
               decoration: InputDecoration(label: const Text("Sobre Nome")),
             ),
             const SizedBox(height: 16),
@@ -58,9 +105,12 @@ class _AddAccountModelWidgetState extends State<AddAccountModelWidget> {
               isExpanded: true,
               items: const [
                 DropdownMenuItem(value: "ANBROSIA", child: Text("ANBROSIA")),
-                DropdownMenuItem(value: "CANGICA",child: Text("CANGICA")),
-                DropdownMenuItem(value: "PUDIM",child: Text("PUDIM")),
-                DropdownMenuItem(value: "BRIGADEIRO",child: Text("item 3")),
+                DropdownMenuItem(value: "CANGICA", child: Text("CANGICA")),
+                DropdownMenuItem(value: "PUDIM", child: Text("PUDIM")),
+                DropdownMenuItem(
+                  value: "BRIGADEIRO",
+                  child: Text("BRIGADEIRO"),
+                ),
               ],
               onChanged: (value) {
                 if (value != null) {
@@ -75,10 +125,8 @@ class _AddAccountModelWidgetState extends State<AddAccountModelWidget> {
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStatePropertyAll(AppColors.orange),
-                    ),
-                    onPressed: () {},
+                    style: ButtonStyle(),
+                    onPressed: (isLoading) ? null : _onButtomCancelClicked,
                     child: const Text(
                       "Cancelar",
                       style: TextStyle(color: Colors.black),
@@ -91,8 +139,8 @@ class _AddAccountModelWidgetState extends State<AddAccountModelWidget> {
                     style: ButtonStyle(
                       backgroundColor: WidgetStatePropertyAll(AppColors.orange),
                     ),
-                    onPressed: () {},
-                    child: const Text(
+                    onPressed: _onButtomSendClicked,
+                    child: (isLoading) ?  CircularProgressIndicator() :  Text(
                       "Adicionar",
                       style: TextStyle(color: Colors.black),
                     ),
